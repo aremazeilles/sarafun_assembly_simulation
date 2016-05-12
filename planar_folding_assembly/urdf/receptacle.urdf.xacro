@@ -1,0 +1,85 @@
+<?xml version="1.0"?>
+<robot name="slider" xmlns:xacro="http://www.ros.org/wiki/xacro">
+
+  <xacro:include filename="$(find planar_folding_assembly)/urdf/constants.urdf.xacro"/>
+
+  <xacro:property name="receptacle_w" value="0.02" />
+  <xacro:property name="receptacle_l" value="0.2" />
+  <xacro:property name="receptacle_h" value="0.05" />
+
+  <xacro:property name="handle_distance" value="0.01" />
+
+  <link name="receptacle_handle" >
+
+    <collision>
+      <geometry>
+        <box size="${handle_size} ${handle_size} ${handle_size}" />
+      </geometry>
+    </collision>
+
+    <visual>
+      <geometry>
+        <box size="${handle_size} ${handle_size} ${handle_size}" />
+      </geometry>
+      <material name="orange"/>
+    </visual>
+
+    <inertial>
+      <mass value="${handle_mass}"/>
+      <inertia
+        ixx="1.0" ixy="0.0" ixz="0.0"
+        iyy="1.0" iyz="0.0"
+        izz="1.0"/>
+    </inertial>
+
+  </link>
+
+  <joint name="receptacle_joint" type="revolute">
+
+    <origin xyz="0 0 ${handle_distance+handle_size/2}" />
+    <parent link="receptacle_handle" />
+    <child link="receptacle" />
+    <limit lower="0" upper="0" velocity="1" effort="1" />
+
+  </joint>
+
+  <link name="receptacle">
+
+    <collision>
+      <origin xyz="0 0 ${receptacle_w/2}" />
+      <geometry>
+        <box size="${receptacle_l} ${objects_depth} ${receptacle_w}" />
+      </geometry>
+    </collision>
+    <collision>
+      <origin xyz="${-receptacle_l/2 + receptacle_w/2} 0 ${receptacle_h/2}" />
+      <geometry>
+        <box size="${receptacle_w} ${objects_depth} ${receptacle_h}" />
+      </geometry>
+    </collision>
+
+    <visual>
+      <origin xyz="0 0 ${receptacle_w/2}" />
+      <geometry>
+        <box size="${receptacle_l} ${objects_depth} ${receptacle_w}" />
+      </geometry>
+    </visual>
+    <visual>
+      <origin xyz="${-receptacle_l/2 + receptacle_w/2} 0 ${receptacle_h/2}" />
+      <geometry>
+        <box size="${receptacle_w} ${objects_depth} ${receptacle_h}" />
+      </geometry>
+    </visual>
+
+    <inertial>
+      <origin xyz="0 0 ${receptacle_h/2}" />
+      <mass value="1"/>
+      <inertia
+        ixx="1.0" ixy="0.0" ixz="0.0"
+        iyy="1.0" iyz="0.0"
+        izz="1.0"/>
+    </inertial>
+
+  </link>
+
+</robot>

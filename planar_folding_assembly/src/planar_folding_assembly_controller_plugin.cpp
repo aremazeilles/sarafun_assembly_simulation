@@ -21,10 +21,10 @@ public:
 
     updateConnection_ = event::Events::ConnectWorldUpdateBegin( boost::bind( &PlanarFoldingAssemblyControllerPlugin::onUpdate, this, _1 ) );
 
-    handle_link_ = model_->GetLink( "handle" );
-    box_link_ = model_->GetLink( "box" );
+    handle_link_ = model_->GetLink( "slider_handle" );
+    box_link_ = model_->GetLink( "slider" );
 
-    handle_joint_ = model_->GetJoint( "handle_joint" );
+    handle_joint_ = model_->GetJoint( "slider_joint" );
 
     handle_joint_->SetProvideFeedback( true );
 

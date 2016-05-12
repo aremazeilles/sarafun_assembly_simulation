@@ -1,0 +1,11 @@
+<?xml version="1.0"?>
+<robot name="planar_folding_assembly_slider" xmlns:xacro="http://www.ros.org/wiki/xacro">
+
+  <xacro:property name="objects_depth" value="0.1" />
+
+  <xacro:property name="handle_size" value="0.01" />
+  <xacro:property name="handle_mass" value="0.01" />
+
+  <xacro:property name="pi" value="3.1415926535897931" />
+
+</robot>

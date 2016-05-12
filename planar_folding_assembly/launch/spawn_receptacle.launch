@@ -1,0 +1,7 @@
+<launch>
+
+  <param name="planar_folding_assembly_receptacle" command="$(find xacro)/xacro.py $(find planar_folding_assembly)/urdf/receptacle.urdf.xacro" />
+
+  <node name="spawn_receptacle_urdf" pkg="gazebo_ros" type="spawn_model" args="-param planar_folding_assembly_receptacle -urdf -z 0.1 -model receptacle" />
+
+</launch>
