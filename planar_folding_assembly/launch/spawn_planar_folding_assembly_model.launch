@@ -1,7 +1,0 @@
-<launch>
-
-  <include file="$(find planar_folding_assembly)/launch/spawn_slider.launch" />
-
-  <include file="$(find planar_folding_assembly)/launch/spawn_receptacle.launch" />
-
-</launch>

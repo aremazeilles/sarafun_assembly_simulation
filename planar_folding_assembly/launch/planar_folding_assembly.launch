@@ -2,6 +2,6 @@
 
   <include file="$(find gazebo_ros)/launch/empty_world.launch" />
 
-  <include file="$(find planar_folding_assembly)/launch/spawn_planar_folding_assembly_model.launch" />
+  <include file="$(find planar_folding_assembly)/launch/spawn_receptacle.launch" />
 
 </launch>
