@@ -21,28 +21,22 @@ public:
 
     updateConnection_ = event::Events::ConnectWorldUpdateBegin( boost::bind( &PlanarFoldingAssemblyControllerPlugin::onUpdate, this, _1 ) );
 
-    physics::JointPtr handle_joint = model_->GetJoint( "handle_joint" );
-    handle_joint->SetProvideFeedback( true );
+    handle_link_ = model_->GetLink( "handle" );
+    box_link_ = model_->GetLink( "box" );
+
+    handle_joint_ = model_->GetJoint( "handle_joint" );
+
+    handle_joint_->SetProvideFeedback( true );
 
   }
 
   void onUpdate( const common::UpdateInfo info )
   {
 
-    // model_->SetLinearVel( math::Vector3( 0, 0, -0.1 ) );
+    handle_link_->SetLinearVel( math::Vector3( 0, 0, -0.1 ) );
 
-    physics::LinkPtr handle_link = model_->GetLink( "handle" );
-    physics::LinkPtr box_link = model_->GetLink( "box" );
-
-    physics::JointPtr handle_joint = model_->GetJoint( "handle_joint" );
-
-    handle_link->SetLinearVel( math::Vector3( 0, 0, -0.1 ) );
-
-    // box_link->AddForce( math::Vector3( 0.0, 0.0, 9.0 ) );
-
-    // math::Vector3 f = box_link->GetWorldForce();
-    math::Vector3 fb1 = handle_joint->GetForceTorque(0).body1Force;
-    math::Vector3 fb2 = handle_joint->GetForceTorque(0).body2Force;
+    math::Vector3 fb1 = handle_joint_->GetForceTorque(0).body1Force;
+    math::Vector3 fb2 = handle_joint_->GetForceTorque(0).body2Force;
 
     std::cout << "fb1: " << fb1.x << ", " << fb1.y << ", " << fb1.z << std::endl;
     std::cout << "fb2: " << fb2.x << ", " << fb2.y << ", " << fb2.z << std::endl;
@@ -52,6 +46,11 @@ public:
 private:
 
   physics::ModelPtr model_;
+
+  physics::LinkPtr handle_link_;
+  physics::LinkPtr box_link_;
+
+  physics::JointPtr handle_joint_;
 
   event::ConnectionPtr updateConnection_;
 
