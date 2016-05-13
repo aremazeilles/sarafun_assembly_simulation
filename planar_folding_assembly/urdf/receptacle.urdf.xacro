@@ -92,9 +92,4 @@
 
   </link>
 
-  <gazebo>
-    <plugin name="test_receptacle_force" filename="libgazebo_ros_test_receptacle_force.so">
-    </plugin>
-  </gazebo>
-
 </robot>
