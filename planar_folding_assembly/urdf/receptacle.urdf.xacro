@@ -9,6 +9,16 @@
 
   <xacro:property name="handle_distance" value="0.01" />
 
+  <link name="world" />
+
+  <joint name="base_receptacle_joint" type="fixed">
+
+    <origin xyz="0 0 0.2" />
+    <parent link="world" />
+    <child link="receptacle_handle" />
+
+  </joint>
+
   <link name="receptacle_handle" >
 
     <collision>
@@ -81,5 +91,10 @@
     </inertial>
 
   </link>
+
+  <gazebo>
+    <plugin name="test_receptacle_force" filename="libgazebo_ros_test_receptacle_force.so">
+    </plugin>
+  </gazebo>
 
 </robot>
