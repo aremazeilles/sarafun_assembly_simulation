@@ -2,6 +2,7 @@
 #include <gazebo/physics/physics.hh>
 
 #include <geometry_msgs/WrenchStamped.h>
+#include <geometry_msgs/PoseStamped.h>
 
 #include <boost/bind.hpp>
 
@@ -51,6 +52,10 @@ private:
   ros::Publisher slider_pose_pub_;
   ros::Publisher slider_wrench_pub_;
 
+  event::ConnectionPtr updateConnection_;
+
+protected:
+  
   physics::WorldPtr world_;
 
   physics::ModelPtr slider_model_;
@@ -62,8 +67,6 @@ private:
   physics::LinkPtr receptacle_handle_link_;
   physics::LinkPtr receptacle_link_;
   physics::JointPtr receptacle_joint_;
-
-  event::ConnectionPtr updateConnection_;
 
 };
 
@@ -112,6 +115,22 @@ void PlanarFoldingAssemblyBasePlugin::Load( physics::ModelPtr model, sdf::Elemen
 
   nh_ = new ros::NodeHandle;
 
+  ros::AdvertiseOptions receptacle_pose_ao = ros::AdvertiseOptions::create<geometry_msgs::PoseStamped>( "receptacle_pose",
+                                                                                                        1,
+                                                                                                        boost::bind( &PlanarFoldingAssemblyBasePlugin::connectCB, this ),
+                                                                                                        boost::bind( &PlanarFoldingAssemblyBasePlugin::disconnectCB, this ),
+                                                                                                        ros::VoidPtr(),
+                                                                                                        &queue_ );
+  receptacle_pose_pub_ = nh_->advertise( receptacle_pose_ao );
+
+  ros::AdvertiseOptions slider_pose_ao = ros::AdvertiseOptions::create<geometry_msgs::PoseStamped>( "slider_pose",
+                                                                                                    1,
+                                                                                                    boost::bind( &PlanarFoldingAssemblyBasePlugin::connectCB, this ),
+                                                                                                    boost::bind( &PlanarFoldingAssemblyBasePlugin::disconnectCB, this ),
+                                                                                                    ros::VoidPtr(),
+                                                                                                    &queue_ );
+  slider_pose_pub_ = nh_->advertise( slider_pose_ao );
+
   ros::AdvertiseOptions receptacle_wrench_ao = ros::AdvertiseOptions::create<geometry_msgs::WrenchStamped>( "receptacle_wrench",
                                                                                                             1,
                                                                                                             boost::bind( &PlanarFoldingAssemblyBasePlugin::connectCB, this ),
@@ -144,6 +163,36 @@ void PlanarFoldingAssemblyBasePlugin::onUpdate( const common::UpdateInfo info )
 
   if( connect_count_ <= 0 )
     return;
+
+  math::Pose receptacle_pose = receptacle_link_->GetWorldCoGPose();
+  math::Pose slider_pose = slider_link_->GetWorldCoGPose();
+
+  geometry_msgs::PoseStamped receptacle_pose_msg;
+  receptacle_pose_msg.header.frame_id = "world";
+  receptacle_pose_msg.header.stamp.sec = world_->GetSimTime().sec;
+  receptacle_pose_msg.header.stamp.nsec = world_->GetSimTime().nsec;
+  receptacle_pose_msg.pose.position.x = receptacle_pose.pos.x;
+  receptacle_pose_msg.pose.position.y = receptacle_pose.pos.y;
+  receptacle_pose_msg.pose.position.z = receptacle_pose.pos.z;
+  receptacle_pose_msg.pose.orientation.x = receptacle_pose.rot.x;
+  receptacle_pose_msg.pose.orientation.y = receptacle_pose.rot.y;
+  receptacle_pose_msg.pose.orientation.z = receptacle_pose.rot.z;
+  receptacle_pose_msg.pose.orientation.w = receptacle_pose.rot.w;
+
+  geometry_msgs::PoseStamped slider_pose_msg;
+  slider_pose_msg.header.frame_id = "world";
+  slider_pose_msg.header.stamp.sec = world_->GetSimTime().sec;
+  slider_pose_msg.header.stamp.nsec = world_->GetSimTime().nsec;
+  slider_pose_msg.pose.position.x = slider_pose.pos.x;
+  slider_pose_msg.pose.position.y = slider_pose.pos.y;
+  slider_pose_msg.pose.position.z = slider_pose.pos.z;
+  slider_pose_msg.pose.orientation.x = slider_pose.rot.x;
+  slider_pose_msg.pose.orientation.y = slider_pose.rot.y;
+  slider_pose_msg.pose.orientation.z = slider_pose.rot.z;
+  slider_pose_msg.pose.orientation.w = slider_pose.rot.w;
+
+  receptacle_pose_pub_.publish( receptacle_pose_msg );
+  slider_pose_pub_.publish( slider_pose_msg );
 
   physics::JointWrench receptacle_wrench = receptacle_joint_->GetForceTorque(0);
   physics::JointWrench slider_wrench = slider_joint_->GetForceTorque(0);
