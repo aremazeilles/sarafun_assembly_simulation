@@ -19,13 +19,13 @@ catkin_package(
   DEPENDS gazebo SDF
 )
 
-add_library( gazebo_ros_empty_controller src/empty_controller.cpp )
-target_link_libraries( gazebo_ros_empty_controller ${GAZEBO_LIBRARIES} ${Boost_LIBRARIES} )
+add_library( sarafun_pfa_empty_controller src/empty_controller.cpp )
+target_link_libraries( sarafun_pfa_empty_controller ${GAZEBO_LIBRARIES} ${Boost_LIBRARIES} )
 
-add_library( gazebo_ros_vertical_force_controller src/vertical_force_controller.cpp )
-target_link_libraries( gazebo_ros_vertical_force_controller ${GAZEBO_LIBRARIES} ${Boost_LIBRARIES} )
+add_library( sarafun_pfa_vertical_force_controller src/vertical_force_controller.cpp )
+target_link_libraries( sarafun_pfa_vertical_force_controller ${GAZEBO_LIBRARIES} ${Boost_LIBRARIES} )
 
-add_library( gazebo_ros_vertical_force_admittance_controller src/vertical_force_admittance_controller.cpp )
-target_link_libraries( gazebo_ros_vertical_force_admittance_controller ${GAZEBO_LIBRARIES} ${Boost_LIBRARIES} )
+add_library( sarafun_pfa_vertical_force_admittance_controller src/vertical_force_admittance_controller.cpp )
+target_link_libraries( sarafun_pfa_vertical_force_admittance_controller ${GAZEBO_LIBRARIES} ${Boost_LIBRARIES} )
 
 

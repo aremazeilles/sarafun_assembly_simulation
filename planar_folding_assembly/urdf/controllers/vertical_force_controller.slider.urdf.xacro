@@ -4,7 +4,7 @@
   <xacro:include filename="$(find planar_folding_assembly)/urdf/slider.urdf.xacro" />
 
   <gazebo>
-    <plugin name="vertical_force_controller" filename="libgazebo_ros_vertical_force_controller.so">
+    <plugin name="vertical_force_controller" filename="libsarafun_pfa_vertical_force_controller.so">
       <target_force>-40</target_force>
     </plugin>
   </gazebo>

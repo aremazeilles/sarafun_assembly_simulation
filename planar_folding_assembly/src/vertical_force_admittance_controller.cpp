@@ -13,7 +13,7 @@ class VerticalForceAdmittanceController : public AdmittanceControllerBase
  
     if( !sdf->HasElement("target_force") )
     {
-      ROS_WARN("Plugin missing <target_force>, using default (40N)");
+      ROS_WARN("Plugin missing <target_force>, using default (-40N)");
       target_force_ = -40;
     }
     else
