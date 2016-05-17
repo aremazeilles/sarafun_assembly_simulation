@@ -39,7 +39,7 @@ public:
 private:
 
   void QueueThread();
-  
+
   ros::NodeHandle* nh_;
 
   ros::CallbackQueue queue_;
@@ -152,23 +152,23 @@ void PlanarFoldingAssemblyBasePlugin::onUpdate( const common::UpdateInfo info )
   receptacle_wrench_msg.header.frame_id = "receptacle";
   receptacle_wrench_msg.header.stamp.sec = world_->GetSimTime().sec;
   receptacle_wrench_msg.header.stamp.nsec = world_->GetSimTime().nsec;
-  receptacle_wrench_msg.wrench.force.x = receptacle_wrench.body1Force.x;
-  receptacle_wrench_msg.wrench.force.y = receptacle_wrench.body1Force.y;
-  receptacle_wrench_msg.wrench.force.z = receptacle_wrench.body1Force.z;
-  receptacle_wrench_msg.wrench.torque.x = receptacle_wrench.body1Torque.x;
-  receptacle_wrench_msg.wrench.torque.y = receptacle_wrench.body1Torque.y;
-  receptacle_wrench_msg.wrench.torque.z = receptacle_wrench.body1Torque.z;
+  receptacle_wrench_msg.wrench.force.x = receptacle_wrench.body2Force.x;
+  receptacle_wrench_msg.wrench.force.y = receptacle_wrench.body2Force.y;
+  receptacle_wrench_msg.wrench.force.z = receptacle_wrench.body2Force.z;
+  receptacle_wrench_msg.wrench.torque.x = receptacle_wrench.body2Torque.x;
+  receptacle_wrench_msg.wrench.torque.y = receptacle_wrench.body2Torque.y;
+  receptacle_wrench_msg.wrench.torque.z = receptacle_wrench.body2Torque.z;
 
   geometry_msgs::WrenchStamped slider_wrench_msg;
   slider_wrench_msg.header.frame_id = "slider";
   slider_wrench_msg.header.stamp.sec = world_->GetSimTime().sec;
   slider_wrench_msg.header.stamp.nsec = world_->GetSimTime().nsec;
-  slider_wrench_msg.wrench.force.x = slider_wrench.body1Force.x;
-  slider_wrench_msg.wrench.force.y = slider_wrench.body1Force.y;
-  slider_wrench_msg.wrench.force.z = slider_wrench.body1Force.z;
-  slider_wrench_msg.wrench.torque.x = slider_wrench.body1Torque.x;
-  slider_wrench_msg.wrench.torque.y = slider_wrench.body1Torque.y;
-  slider_wrench_msg.wrench.torque.z = slider_wrench.body1Torque.z;
+  slider_wrench_msg.wrench.force.x = slider_wrench.body2Force.x;
+  slider_wrench_msg.wrench.force.y = slider_wrench.body2Force.y;
+  slider_wrench_msg.wrench.force.z = slider_wrench.body2Force.z;
+  slider_wrench_msg.wrench.torque.x = slider_wrench.body2Torque.x;
+  slider_wrench_msg.wrench.torque.y = slider_wrench.body2Torque.y;
+  slider_wrench_msg.wrench.torque.z = slider_wrench.body2Torque.z;
 
   receptacle_wrench_pub_.publish( receptacle_wrench_msg );
   slider_wrench_pub_.publish( slider_wrench_msg );
