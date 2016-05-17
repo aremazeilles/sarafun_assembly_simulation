@@ -1,0 +1,11 @@
+<?xml version="1.0"?>
+<robot name="slider" xmlns:xacro="http://www.ros.org/wiki/xacro">
+
+  <xacro:include filename="$(find planar_folding_assembly)/urdf/slider.urdf.xacro" />
+
+  <gazebo>
+    <plugin name="empty_controller" filename="libgazebo_ros_empty_controller.so">
+    </plugin>
+  </gazebo>
+
+</robot>

@@ -85,9 +85,4 @@
 
   </link>
 
-  <gazebo>
-    <plugin name="planar_folding_controller" filename="$(arg model_plugin)">
-    </plugin>
-  </gazebo>
-
 </robot>
