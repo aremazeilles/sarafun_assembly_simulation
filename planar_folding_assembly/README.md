@@ -6,24 +6,6 @@ The naming convention used is that the __slider__ object is the one assembled on
 ![Simulation screenshot](img/sim_screenshot.bmp)
 
 
-## Description of the objects
-
-The objects are defined in two `xacro` files:
-
-- `urdf/slider.urdf.xacro`
-- `urdf/receptacle.urdf.xacro`
-
-Both objects are constructed out of geometric primitives, since these supposedly provide better performance of the physics simulation with respect to using custom meshes.
-
-### Slider
-
-![Slider object](img/slider.png)
-
-### Receptacle
-
-![Receptacle object](img/receptacle.png)
-
-
 ## Basic usage
 
 To start the simulation using one of the provided controllers, the simulator with the receptacle object need to be launched first, using
@@ -65,3 +47,21 @@ roslaunch planar_folding_assembly spawn_slider.launch model_plugin:=libgazebo_ro
 ```
 
 __Note that `lib` and `.so` are automatically pre/apended to the plugin name and need to be specified to the roslaunch argument.__
+
+
+## Description of the objects
+
+The objects are defined in two `xacro` files:
+
+- `urdf/slider.urdf.xacro`
+- `urdf/receptacle.urdf.xacro`
+
+Both objects are constructed out of geometric primitives, since these supposedly provide better performance of the physics simulation with respect to using custom meshes.
+
+### Slider
+
+![Slider object](img/slider.png)
+
+### Receptacle
+
+![Receptacle object](img/receptacle.png)
