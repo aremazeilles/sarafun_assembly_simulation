@@ -19,9 +19,6 @@ catkin_package(
   DEPENDS gazebo SDF
 )
 
-add_library( gazebo_ros_planar_folding_assembly_controller src/planar_folding_assembly_controller_plugin.cpp )
-target_link_libraries( gazebo_ros_planar_folding_assembly_controller ${GAZEBO_LIBRARIES} )
-
 add_library( gazebo_ros_empty_controller src/empty_controller.cpp )
 target_link_libraries( gazebo_ros_empty_controller ${GAZEBO_LIBRARIES} ${Boost_LIBRARIES} )
 
