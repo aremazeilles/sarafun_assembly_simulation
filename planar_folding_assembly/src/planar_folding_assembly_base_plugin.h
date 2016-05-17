@@ -43,7 +43,6 @@ private:
 
   ros::NodeHandle* nh_;
 
-  ros::CallbackQueue queue_;
   boost::thread callback_queue_thread_;
 
   int connect_count_;
@@ -55,6 +54,8 @@ private:
   event::ConnectionPtr updateConnection_;
 
 protected:
+
+  ros::CallbackQueue queue_;
   
   physics::WorldPtr world_;
 
