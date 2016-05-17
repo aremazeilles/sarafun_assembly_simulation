@@ -21,6 +21,36 @@ class VerticalForceAdmittanceController : public AdmittanceControllerBase
       target_force_ = sdf->GetElement("target_force")->Get<double>();
     }
 
+    if( !sdf->HasElement("p_gain") )
+    {
+      ROS_WARN("Plugin missing <p_gain>, using default (0.1)");
+      p_gain_ = 0.1;
+    }
+    else
+    {
+      p_gain_ = sdf->GetElement("p_gain")->Get<double>();
+    }
+
+    if( !sdf->HasElement("i_gain") )
+    {
+      ROS_WARN("Plugin missing <i_gain>, using default (0.05)");
+      i_gain_ = 0.05;
+    }
+    else
+    {
+      i_gain_ = sdf->GetElement("i_gain")->Get<double>();
+    }
+
+    if( !sdf->HasElement("vert_correct_gain") )
+    {
+      ROS_WARN("Plugin missing <vert_correct_gain>, using default (0.1)");
+      vert_correct_gain_ = 0.1;
+    }
+    else
+    {
+      vert_correct_gain_ = sdf->GetElement("vert_correct_gain")->Get<double>();
+    }
+
     time_initialised_ = false;
     integral_force_error_ = 0.0;
 
@@ -47,7 +77,7 @@ class VerticalForceAdmittanceController : public AdmittanceControllerBase
 
     math::Pose slider_handle_pose = slider_handle_link_->GetWorldCoGPose();
 
-    *slider_lin_vel = math::Vector3( -0.1*slider_handle_pose.pos.x, 0, 0.1*error + 0.05*integral_force_error_ );
+    *slider_lin_vel = math::Vector3( -vert_correct_gain_*slider_handle_pose.pos.x, 0, p_gain_*error + i_gain_*integral_force_error_ );
 
     previous_time_ = info.simTime;
 
@@ -56,6 +86,9 @@ class VerticalForceAdmittanceController : public AdmittanceControllerBase
 private:
 
   double target_force_;
+  double p_gain_;
+  double i_gain_;
+  double vert_correct_gain_;
 
   bool time_initialised_;
   common::Time previous_time_;
