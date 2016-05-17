@@ -25,4 +25,10 @@ target_link_libraries( gazebo_ros_planar_folding_assembly_controller ${GAZEBO_LI
 add_library( gazebo_ros_empty_controller src/empty_controller.cpp )
 target_link_libraries( gazebo_ros_empty_controller ${GAZEBO_LIBRARIES} ${Boost_LIBRARIES} )
 
+add_library( gazebo_ros_vertical_force_controller src/vertical_force_controller.cpp )
+target_link_libraries( gazebo_ros_vertical_force_controller ${GAZEBO_LIBRARIES} ${Boost_LIBRARIES} )
+
+add_library( gazebo_ros_vertical_force_admittance_controller src/vertical_force_admittance_controller.cpp )
+target_link_libraries( gazebo_ros_vertical_force_admittance_controller ${GAZEBO_LIBRARIES} ${Boost_LIBRARIES} )
+
 
