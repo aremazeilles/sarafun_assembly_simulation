@@ -1,11 +1,11 @@
-#include "planar_folding_assembly_base_plugin.h"
+#include "base/controller_base.h"
 
 #include <ros/ros.h>
 
 namespace gazebo
 {
   
-class VerticalForceController : public PlanarFoldingAssemblyBasePlugin
+class VerticalForceController : public ControllerBase
 {
 
   virtual void controllerLoad( physics::ModelPtr model, sdf::ElementPtr sdf )

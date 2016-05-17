@@ -16,14 +16,14 @@
 namespace gazebo
 {
 
-class PlanarFoldingAssemblyBasePlugin : public ModelPlugin
+class ControllerBase : public ModelPlugin
 {
 
 public:
 
-  PlanarFoldingAssemblyBasePlugin();
+  ControllerBase();
 
-  virtual ~PlanarFoldingAssemblyBasePlugin();
+  virtual ~ControllerBase();
 
   void Load( physics::ModelPtr model, sdf::ElementPtr sdf );
 
@@ -72,14 +72,14 @@ protected:
 };
 
 
-PlanarFoldingAssemblyBasePlugin::PlanarFoldingAssemblyBasePlugin()
+ControllerBase::ControllerBase()
   : connect_count_(0)
 {
 
 }
 
 
-PlanarFoldingAssemblyBasePlugin::~PlanarFoldingAssemblyBasePlugin()
+ControllerBase::~ControllerBase()
 {
   event::Events::DisconnectWorldUpdateBegin( updateConnection_ );
   queue_.clear();
@@ -90,7 +90,7 @@ PlanarFoldingAssemblyBasePlugin::~PlanarFoldingAssemblyBasePlugin()
 }
 
 
-void PlanarFoldingAssemblyBasePlugin::Load( physics::ModelPtr model, sdf::ElementPtr sdf )
+void ControllerBase::Load( physics::ModelPtr model, sdf::ElementPtr sdf )
 {
 
   world_ = model->GetWorld();
@@ -118,46 +118,46 @@ void PlanarFoldingAssemblyBasePlugin::Load( physics::ModelPtr model, sdf::Elemen
 
   ros::AdvertiseOptions receptacle_pose_ao = ros::AdvertiseOptions::create<geometry_msgs::PoseStamped>( "receptacle_pose",
                                                                                                         1,
-                                                                                                        boost::bind( &PlanarFoldingAssemblyBasePlugin::connectCB, this ),
-                                                                                                        boost::bind( &PlanarFoldingAssemblyBasePlugin::disconnectCB, this ),
+                                                                                                        boost::bind( &ControllerBase::connectCB, this ),
+                                                                                                        boost::bind( &ControllerBase::disconnectCB, this ),
                                                                                                         ros::VoidPtr(),
                                                                                                         &queue_ );
   receptacle_pose_pub_ = nh_->advertise( receptacle_pose_ao );
 
   ros::AdvertiseOptions slider_pose_ao = ros::AdvertiseOptions::create<geometry_msgs::PoseStamped>( "slider_pose",
                                                                                                     1,
-                                                                                                    boost::bind( &PlanarFoldingAssemblyBasePlugin::connectCB, this ),
-                                                                                                    boost::bind( &PlanarFoldingAssemblyBasePlugin::disconnectCB, this ),
+                                                                                                    boost::bind( &ControllerBase::connectCB, this ),
+                                                                                                    boost::bind( &ControllerBase::disconnectCB, this ),
                                                                                                     ros::VoidPtr(),
                                                                                                     &queue_ );
   slider_pose_pub_ = nh_->advertise( slider_pose_ao );
 
   ros::AdvertiseOptions receptacle_wrench_ao = ros::AdvertiseOptions::create<geometry_msgs::WrenchStamped>( "receptacle_wrench",
                                                                                                             1,
-                                                                                                            boost::bind( &PlanarFoldingAssemblyBasePlugin::connectCB, this ),
-                                                                                                            boost::bind( &PlanarFoldingAssemblyBasePlugin::disconnectCB, this ),
+                                                                                                            boost::bind( &ControllerBase::connectCB, this ),
+                                                                                                            boost::bind( &ControllerBase::disconnectCB, this ),
                                                                                                             ros::VoidPtr(),
                                                                                                             &queue_ );
   receptacle_wrench_pub_ = nh_->advertise( receptacle_wrench_ao );
 
   ros::AdvertiseOptions slider_wrench_ao = ros::AdvertiseOptions::create<geometry_msgs::WrenchStamped>( "slider_wrench",
                                                                                                         1,
-                                                                                                        boost::bind( &PlanarFoldingAssemblyBasePlugin::connectCB, this ),
-                                                                                                        boost::bind( &PlanarFoldingAssemblyBasePlugin::disconnectCB, this ),
+                                                                                                        boost::bind( &ControllerBase::connectCB, this ),
+                                                                                                        boost::bind( &ControllerBase::disconnectCB, this ),
                                                                                                         ros::VoidPtr(),
                                                                                                         &queue_ );
   slider_wrench_pub_ = nh_->advertise( slider_wrench_ao );
 
-  callback_queue_thread_ = boost::thread( boost::bind( &PlanarFoldingAssemblyBasePlugin::QueueThread, this ) );
+  callback_queue_thread_ = boost::thread( boost::bind( &ControllerBase::QueueThread, this ) );
 
   controllerLoad( model, sdf );
 
-  updateConnection_ = event::Events::ConnectWorldUpdateBegin( boost::bind( &PlanarFoldingAssemblyBasePlugin::onUpdate, this, _1 ) );
+  updateConnection_ = event::Events::ConnectWorldUpdateBegin( boost::bind( &ControllerBase::onUpdate, this, _1 ) );
 
 }
 
 
-void PlanarFoldingAssemblyBasePlugin::onUpdate( const common::UpdateInfo info )
+void ControllerBase::onUpdate( const common::UpdateInfo info )
 {
 
   controllerUpdate( info );
@@ -226,19 +226,19 @@ void PlanarFoldingAssemblyBasePlugin::onUpdate( const common::UpdateInfo info )
 }
 
 
-void PlanarFoldingAssemblyBasePlugin::connectCB()
+void ControllerBase::connectCB()
 {
   ++connect_count_;
 }
 
 
-void PlanarFoldingAssemblyBasePlugin::disconnectCB()
+void ControllerBase::disconnectCB()
 {
   --connect_count_;
 }
 
 
-void PlanarFoldingAssemblyBasePlugin::QueueThread()
+void ControllerBase::QueueThread()
 {
 
   static const double timeout = 0.01;

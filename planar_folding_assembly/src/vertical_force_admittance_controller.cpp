@@ -1,4 +1,4 @@
-#include "admittance_controller_base.h"
+#include "base/admittance_controller_base.h"
 
 #include <ros/ros.h>
 

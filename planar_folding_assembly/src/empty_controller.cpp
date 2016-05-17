@@ -1,9 +1,9 @@
-#include "planar_folding_assembly_base_plugin.h"
+#include "base/controller_base.h"
 
 namespace gazebo
 {
   
-class EmptyController : public PlanarFoldingAssemblyBasePlugin
+class EmptyController : public ControllerBase
 {
   
   virtual void controllerLoad( physics::ModelPtr model, sdf::ElementPtr sdf ) {}

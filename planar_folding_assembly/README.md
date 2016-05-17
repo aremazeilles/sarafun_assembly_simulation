@@ -26,7 +26,7 @@ The reason for forcing the spawning order is that the controller plugin will try
 
 ## Controller infrastructure
 
-A base class for the controller plugin is provided in [`PlanarFoldingAssemblyBasePlugin`](src/planar_folding_assembly_base_plugin.h).
+A base class for the controller plugin is provided in [`ControllerBase`](src/base/controller_base.h).
 This base class takes care of the following resposabilities:
 
 - Get pointers to both objects and the joints attaching them to their handles
@@ -40,7 +40,7 @@ The controllers built on top of this class must override the following functions
 
 New controller plugins can be deployed using this base by following the next steps:
 
-1. Create a new class deriving from `PlanarFoldingAssemblyBasePlugin` (see the [`EmptyController`](src/empty_controller.cpp) for a barebones example, and [`VerticalForceController`](src/vertical_force_controller.cpp) for a more complex example)
+1. Create a new class deriving from `ControllerBase` (see the [`EmptyController`](src/empty_controller.cpp) for a barebones example, and [`VerticalForceController`](src/vertical_force_controller.cpp) for a more complex example)
 2. Implement the controller behaviour by overriding the `controllerLoad` and `controllerUpdate` functions
 3. Advertise the new class as a plugin using the `GZ_REGISTER_MODEL_PLUGIN` macro
 4. Add the new source file to the `CMakeLists.txt` as follows
@@ -60,15 +60,15 @@ roslaunch planar_folding_assembly spawn_slider.launch controller:=CONTROLLER_NAM
 
 ### Admittance controller base
 
-In addition to `PlanarFoldingAssemblyBasePlugin`, another convenience base class, [`AdmittanceControllerBase`](src/admittance_controller_base.h) is provided to ease implementation of admittance controllers.
+In addition to `ControllerBase`, another convenience base class, [`AdmittanceControllerBase`](src/base/admittance_controller_base.h) is provided to ease implementation of admittance controllers.
 
 This class takes care of:
 
 - reading wrenches acting on both objects and filtering them to reduce noise
 - calling the update function on its virtual `admittanceControllerUpdate` function, where derived admittance controllers can implement their behaviour
-- publishing the filtered wrenches in addition to the unfiletered ones published by `PlanarFoldingAssemblyBasePlugin`
+- publishing the filtered wrenches in addition to the unfiletered ones published by `ControllerBase`
 
-In order to write an admittance controller derived from this base class, substitute the steps 1 and 2 in the instructions to derive from `PlanarFoldingAssemblyBasePlugin` with the following steps
+In order to write an admittance controller derived from this base class, substitute the steps 1 and 2 in the instructions to derive from `ControllerBase` with the following steps
 
 1. Create a new class deriving from `AdmittanceControllerBase` (see the [`VerticalForceAdmittanceController`](src/vertical_force_admittance_controller.cpp) for an example)
 2. Implement the controller behaviour by overriding the `admittanceControllerLoad` and `admittanceControllerUpdate` functions

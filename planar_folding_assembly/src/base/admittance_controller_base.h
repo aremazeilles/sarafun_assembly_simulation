@@ -1,9 +1,9 @@
-#include "planar_folding_assembly_base_plugin.h"
+#include "controller_base.h"
 
 namespace gazebo
 {
   
-class AdmittanceControllerBase : public PlanarFoldingAssemblyBasePlugin
+class AdmittanceControllerBase : public ControllerBase
 {
   
   void controllerLoad( physics::ModelPtr model, sdf::ElementPtr sdf )
@@ -12,19 +12,19 @@ class AdmittanceControllerBase : public PlanarFoldingAssemblyBasePlugin
     nh_ = new ros::NodeHandle;
 
     ros::AdvertiseOptions filtered_receptacle_wrench_ao = ros::AdvertiseOptions::create<geometry_msgs::WrenchStamped>( "filtered_receptacle_wrench",
-                                                                                                              1,
-                                                                                                              boost::bind( &PlanarFoldingAssemblyBasePlugin::connectCB, this ),
-                                                                                                              boost::bind( &PlanarFoldingAssemblyBasePlugin::disconnectCB, this ),
-                                                                                                              ros::VoidPtr(),
-                                                                                                              &queue_ );
+                                                                                                                       1,
+                                                                                                                       boost::bind( &ControllerBase::connectCB, this ),
+                                                                                                                       boost::bind( &ControllerBase::disconnectCB, this ),
+                                                                                                                       ros::VoidPtr(),
+                                                                                                                       &queue_ );
     filtered_receptacle_wrench_pub_ = nh_->advertise( filtered_receptacle_wrench_ao );
 
     ros::AdvertiseOptions filtered_slider_wrench_ao = ros::AdvertiseOptions::create<geometry_msgs::WrenchStamped>( "filtered_slider_wrench",
-                                                                                                          1,
-                                                                                                          boost::bind( &PlanarFoldingAssemblyBasePlugin::connectCB, this ),
-                                                                                                          boost::bind( &PlanarFoldingAssemblyBasePlugin::disconnectCB, this ),
-                                                                                                          ros::VoidPtr(),
-                                                                                                          &queue_ );
+                                                                                                                   1,
+                                                                                                                   boost::bind( &ControllerBase::connectCB, this ),
+                                                                                                                   boost::bind( &ControllerBase::disconnectCB, this ),
+                                                                                                                   ros::VoidPtr(),
+                                                                                                                   &queue_ );
     filtered_slider_wrench_pub_ = nh_->advertise( filtered_slider_wrench_ao );
 
     filter_decay_ = 0.9;
