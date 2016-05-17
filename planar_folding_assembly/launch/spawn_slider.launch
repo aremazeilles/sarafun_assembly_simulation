@@ -1,6 +1,8 @@
 <launch>
 
-  <param name="planar_folding_assembly_slider" command="$(find xacro)/xacro.py $(find planar_folding_assembly)/urdf/slider.urdf.xacro" />
+  <arg name="model_plugin" default="libgazebo_ros_empty_controller.so" />
+
+  <param name="planar_folding_assembly_slider" command="$(find xacro)/xacro.py $(find planar_folding_assembly)/urdf/slider.urdf.xacro model_plugin:=$(arg model_plugin)" />
 
   <node name="spawn_slider_urdf" pkg="gazebo_ros" type="spawn_model" args="-param planar_folding_assembly_slider -urdf -z 0.4 -model slider" />
 
