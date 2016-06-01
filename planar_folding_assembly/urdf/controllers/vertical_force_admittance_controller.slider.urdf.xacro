@@ -7,7 +7,7 @@
     <plugin name="vertical_force_admittance_controller" filename="libsarafun_pfa_vertical_force_admittance_controller.so">
       <target_force>-40</target_force>
       <p_gain>0.1</p_gain>
-      <i_gain>0.05</i_gain>
+      <i_gain>0.1</i_gain>
       <vert_correct_gain>0.1</vert_correct_gain>
     </plugin>
   </gazebo>
