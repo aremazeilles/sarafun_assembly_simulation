@@ -5,6 +5,8 @@ The naming convention used is that the __slider__ object is the one assembled on
 
 ![Simulation screenshot](img/sim_screenshot.bmp)
 
+The objective of this simulation is to try to replicate the controller described in [this paper](https://arxiv.org/abs/1604.06558), in order to perform a sliding motion and then a folding motion while maintaining the desired contact forces.
+
 
 ## Basic usage
 
