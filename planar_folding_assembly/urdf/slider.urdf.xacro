@@ -85,4 +85,9 @@
 
   </link>
 
+  <gazebo reference="slider">
+    <mu1>0.0</mu1>
+    <mu2>0.0</mu2>
+  </gazebo>
+
 </robot>

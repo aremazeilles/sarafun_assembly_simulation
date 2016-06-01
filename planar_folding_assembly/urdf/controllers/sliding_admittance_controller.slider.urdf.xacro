@@ -1,0 +1,18 @@
+<?xml version="1.0"?>
+<robot name="slider" xmlns:xacro="http://www.ros.org/wiki/xacro">
+
+  <xacro:include filename="$(find planar_folding_assembly)/urdf/slider.urdf.xacro" />
+
+  <gazebo>
+    <plugin name="sliding_admittance_controller" filename="libsarafun_pfa_sliding_admittance_controller.so">
+      <target_angle>1.0</target_angle>
+      <target_force>10</target_force>
+      <target_vel>0.005</target_vel>
+      <p_gain>0.1</p_gain>
+      <i_gain>0.1</i_gain>
+      <rot_gain>0.1</rot_gain>
+      <vert_correct_gain>0.1</vert_correct_gain>
+    </plugin>
+  </gazebo>
+
+</robot>
