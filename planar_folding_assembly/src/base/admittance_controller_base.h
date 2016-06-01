@@ -50,6 +50,9 @@ class AdmittanceControllerBase : public ControllerBase
     slider_handle_link_->SetLinearVel( slider_lin_vel );
     slider_handle_link_->SetAngularVel( slider_rot_vel );
 
+    if( connect_count_ <= 0 )
+      return;
+
     geometry_msgs::WrenchStamped filtered_receptacle_wrench_msg;
     filtered_receptacle_wrench_msg.header.frame_id = "receptacle";
     filtered_receptacle_wrench_msg.header.stamp.sec = world_->GetSimTime().sec;

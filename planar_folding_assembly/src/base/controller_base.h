@@ -45,7 +45,6 @@ private:
 
   boost::thread callback_queue_thread_;
 
-  int connect_count_;
   ros::Publisher receptacle_pose_pub_;
   ros::Publisher receptacle_wrench_pub_;
   ros::Publisher slider_pose_pub_;
@@ -55,6 +54,7 @@ private:
 
 protected:
 
+  int connect_count_;
   ros::CallbackQueue queue_;
   
   physics::WorldPtr world_;
