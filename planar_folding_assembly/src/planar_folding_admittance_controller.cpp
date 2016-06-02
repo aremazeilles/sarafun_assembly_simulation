@@ -6,6 +6,9 @@ namespace gazebo
 {
 
 
+const double PI = 4*atan2(1,1);
+
+
 namespace PlanarFoldingPhases
 {
 enum PlanarFoldingPhase
@@ -97,8 +100,8 @@ void PlanarFoldingAdmittanceController::admittanceControllerLoad( physics::Model
 
   if( !sdf->HasElement("target_sliding_angle") )
   {
-    ROS_WARN("Plugin missing <target_sliding_angle>, using default (1 rad)");
-    target_sliding_angle_ = 1.0;
+    ROS_WARN("Plugin missing <target_sliding_angle>, using default (pi/4 rad)");
+    target_sliding_angle_ = PI/4;
   }
   else
   {
@@ -117,8 +120,8 @@ void PlanarFoldingAdmittanceController::admittanceControllerLoad( physics::Model
 
   if( !sdf->HasElement("target_folding_angle") )
   {
-    ROS_WARN("Plugin missing <target_folding_angle>, using default (1 rad)");
-    target_folding_angle_ = 1.0;
+    ROS_WARN("Plugin missing <target_folding_angle>, using default (0.1 rad)");
+    target_folding_angle_ = 0.1;
   }
   else
   {
@@ -157,8 +160,8 @@ void PlanarFoldingAdmittanceController::admittanceControllerLoad( physics::Model
 
   if( !sdf->HasElement("normal_force_i_gain") )
   {
-    ROS_WARN("Plugin missing <normal_force_i_gain>, using default (0.05)");
-    normal_force_i_gain_ = 0.05;
+    ROS_WARN("Plugin missing <normal_force_i_gain>, using default (0.2)");
+    normal_force_i_gain_ = 0.2;
   }
   else
   {
@@ -177,8 +180,8 @@ void PlanarFoldingAdmittanceController::admittanceControllerLoad( physics::Model
 
   if( !sdf->HasElement("tangential_force_i_gain") )
   {
-    ROS_WARN("Plugin missing <tangential_force_i_gain>, using default (0.05)");
-    tangential_force_i_gain_ = 0.05;
+    ROS_WARN("Plugin missing <tangential_force_i_gain>, using default (0.2)");
+    tangential_force_i_gain_ = 0.2;
   }
   else
   {
@@ -187,8 +190,8 @@ void PlanarFoldingAdmittanceController::admittanceControllerLoad( physics::Model
 
   if( !sdf->HasElement("rot_gain") )
   {
-    ROS_WARN("Plugin missing <rot_gain>, using default (0.05)");
-    rot_gain_ = 0.05;
+    ROS_WARN("Plugin missing <rot_gain>, using default (0.2)");
+    rot_gain_ = 0.2;
   }
   else
   {
@@ -197,8 +200,8 @@ void PlanarFoldingAdmittanceController::admittanceControllerLoad( physics::Model
 
   if( !sdf->HasElement("contact_detection_vel") )
   {
-    ROS_WARN("Plugin missing <contact_detection_vel>, using default (0.002 m/s)");
-    contact_detection_vel_ = 0.002;
+    ROS_WARN("Plugin missing <contact_detection_vel>, using default (0.005 m/s)");
+    contact_detection_vel_ = 0.005;
   }
   else
   {
@@ -207,8 +210,8 @@ void PlanarFoldingAdmittanceController::admittanceControllerLoad( physics::Model
 
   if( !sdf->HasElement("contact_detection_threshold") )
   {
-    ROS_WARN("Plugin missing <contact_detection_threshold>, using default (0.2 N)");
-    contact_detection_threshold_ = 0.2;
+    ROS_WARN("Plugin missing <contact_detection_threshold>, using default (0.01 N)");
+    contact_detection_threshold_ = 0.01;
   }
   else
   {
@@ -217,8 +220,8 @@ void PlanarFoldingAdmittanceController::admittanceControllerLoad( physics::Model
 
   if( !sdf->HasElement("switch_to_fold_threshold") )
   {
-    ROS_WARN("Plugin missing <switch_to_fold_threshold>, using default (0.5 N)");
-    switch_to_fold_threshold_ = 0.5;
+    ROS_WARN("Plugin missing <switch_to_fold_threshold>, using default (0.02 N)");
+    switch_to_fold_threshold_ = 0.02;
   }
   else
   {
@@ -227,8 +230,8 @@ void PlanarFoldingAdmittanceController::admittanceControllerLoad( physics::Model
 
   if( !sdf->HasElement("switch_to_slide_threshold") )
   {
-    ROS_WARN("Plugin missing <switch_to_slide_threshold>, using default (0.5 N)");
-    switch_to_slide_threshold_ = 0.2;
+    ROS_WARN("Plugin missing <switch_to_slide_threshold>, using default (0.01 N)");
+    switch_to_slide_threshold_ = 0.01;
   }
   else
   {
