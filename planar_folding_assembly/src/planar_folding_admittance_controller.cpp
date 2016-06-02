@@ -31,29 +31,32 @@ class PlanarFoldingAdmittanceController : public AdmittanceControllerBase
                                            math::Vector3* slider_lin_vel,
                                            math::Vector3* slider_rot_vel );
 
-  void doSearchingContactUpdate( const common::UpdateInfo info,
-                                 const math::Vector3& receptacle_force,
-                                 const math::Vector3& receptacle_torque,
-                                 const math::Vector3& slider_force,
-                                 const math::Vector3& slider_torque,
-                                 math::Vector3* slider_lin_vel,
+  void doSearchingContactUpdate( math::Vector3* slider_lin_vel,
                                  math::Vector3* slider_rot_vel );
 
   void doSlidingUpdate( const common::UpdateInfo info,
                         const math::Vector3& receptacle_force,
-                        const math::Vector3& receptacle_torque,
-                        const math::Vector3& slider_force,
-                        const math::Vector3& slider_torque,
                         math::Vector3* slider_lin_vel,
                         math::Vector3* slider_rot_vel );
 
   void doFoldingUpdate( const common::UpdateInfo info,
                         const math::Vector3& receptacle_force,
-                        const math::Vector3& receptacle_torque,
-                        const math::Vector3& slider_force,
-                        const math::Vector3& slider_torque,
                         math::Vector3* slider_lin_vel,
                         math::Vector3* slider_rot_vel );
+
+  void transformContactVelToHandle( double angle,
+                                    const math::Vector3& contact_point_lin_vel,
+                                    const math::Vector3& contact_point_rot_vel,
+                                    math::Vector3* handle_lin_vel,
+                                    math::Vector3* handle_rot_vel );
+
+  math::Vector3 computeAngleCorrectionTerm( double target_angle, double* angle = 0 );
+
+  math::Vector3 computeNormalForceCorrectionTerm( const common::UpdateInfo info,
+                                                  const math::Vector3& receptacle_force );
+
+  math::Vector3 computeTangentialForceCorrectionTerm( const common::UpdateInfo info,
+                                                      const math::Vector3& receptacle_force );
 
 private:
 
@@ -71,12 +74,16 @@ private:
   double tangential_force_p_gain_;
   double tangential_force_i_gain_;
   double rot_gain_;
+  double contact_detection_vel_;
+  double contact_detection_threshold_;
   double switch_to_fold_threshold_;
   double switch_to_slide_threshold_;
 
   bool time_initialised_;
   common::Time previous_time_;
-  double integral_force_error_;
+
+  double integral_normal_force_error_;
+  double integral_tangential_force_error_;
 
   math::Pose slider_cog_T_virtual_contact_point_;
 
@@ -188,6 +195,26 @@ void PlanarFoldingAdmittanceController::admittanceControllerLoad( physics::Model
     rot_gain_ = sdf->GetElement("rot_gain")->Get<double>();
   }
 
+  if( !sdf->HasElement("contact_detection_vel") )
+  {
+    ROS_WARN("Plugin missing <contact_detection_vel>, using default (0.002 m/s)");
+    contact_detection_vel_ = 0.002;
+  }
+  else
+  {
+    contact_detection_vel_ = sdf->GetElement("contact_detection_vel")->Get<double>();
+  }
+
+  if( !sdf->HasElement("contact_detection_threshold") )
+  {
+    ROS_WARN("Plugin missing <contact_detection_threshold>, using default (0.2 N)");
+    contact_detection_threshold_ = 0.2;
+  }
+  else
+  {
+    contact_detection_threshold_ = sdf->GetElement("contact_detection_threshold")->Get<double>();
+  }
+
   if( !sdf->HasElement("switch_to_fold_threshold") )
   {
     ROS_WARN("Plugin missing <switch_to_fold_threshold>, using default (0.5 N)");
@@ -209,7 +236,8 @@ void PlanarFoldingAdmittanceController::admittanceControllerLoad( physics::Model
   }
 
   time_initialised_ = false;
-  integral_force_error_ = 0.0;
+  integral_normal_force_error_ = 0.0;
+  integral_tangential_force_error_ = 0.0;
 
   nh_ = new ros::NodeHandle;
 
@@ -243,7 +271,48 @@ void PlanarFoldingAdmittanceController::admittanceControllerUpdate( const common
     time_initialised_ = true;
   }
 
-  doSlidingUpdate( info, receptacle_force, receptacle_torque, slider_force, slider_torque, slider_lin_vel, slider_rot_vel );
+  switch( phase_ )
+  {
+    case PlanarFoldingPhases::SEARCHING_CONTACT:
+      if( receptacle_force.z <= -contact_detection_threshold_ )
+      {
+        ROS_WARN( "Contact detected, switching to sliding phase" );
+        phase_ = PlanarFoldingPhases::SLIDING;
+      }
+      break;
+    case PlanarFoldingPhases::SLIDING:
+      if( receptacle_force.x <= -switch_to_fold_threshold_ )
+      {
+        ROS_WARN( "Tangential contact detected, switching to folding phase" );
+        phase_ = PlanarFoldingPhases::FOLDING;
+      }
+      break;
+    case PlanarFoldingPhases::FOLDING:
+      if( receptacle_force.x >= -switch_to_slide_threshold_ )
+      {
+        ROS_WARN( "Tangential contact lost, switching to sliding phase" );
+        phase_ = PlanarFoldingPhases::SLIDING;
+      }
+      break;
+  }
+
+  switch( phase_ )
+  {
+    case PlanarFoldingPhases::SEARCHING_CONTACT:
+      doSearchingContactUpdate( slider_lin_vel, slider_rot_vel );
+      break;
+    case PlanarFoldingPhases::SLIDING:
+      doSlidingUpdate( info, receptacle_force, slider_lin_vel, slider_rot_vel );
+      break;
+    case PlanarFoldingPhases::FOLDING:
+      doFoldingUpdate( info, receptacle_force, slider_lin_vel, slider_rot_vel );
+      break;
+    default:
+      ROS_ERROR_STREAM_THROTTLE( 1.0, "Somehow reached an invalid phase: " << phase_ << ". Please stop the simulation." );
+      *slider_lin_vel = math::Vector3::Zero;
+      *slider_rot_vel = math::Vector3::Zero;
+      break;
+  }
 
   previous_time_ = info.simTime;
 
@@ -269,57 +338,98 @@ void PlanarFoldingAdmittanceController::admittanceControllerUpdate( const common
 }
 
 
-void PlanarFoldingAdmittanceController::doSearchingContactUpdate( const common::UpdateInfo info,
-                                                                  const math::Vector3& receptacle_force,
-                                                                  const math::Vector3& receptacle_torque,
-                                                                  const math::Vector3& slider_force,
-                                                                  const math::Vector3& slider_torque,
-                                                                  math::Vector3* slider_lin_vel,
+void PlanarFoldingAdmittanceController::doSearchingContactUpdate( math::Vector3* slider_lin_vel,
                                                                   math::Vector3* slider_rot_vel )
 {
+
+  *slider_lin_vel = math::Vector3( 0, 0, -contact_detection_vel_ );
+  *slider_rot_vel = math::Vector3::Zero;
 
 }
 
 void PlanarFoldingAdmittanceController::doSlidingUpdate( const common::UpdateInfo info,
                                                          const math::Vector3& receptacle_force,
-                                                         const math::Vector3& receptacle_torque,
-                                                         const math::Vector3& slider_force,
-                                                         const math::Vector3& slider_torque,
                                                          math::Vector3* slider_lin_vel,
                                                          math::Vector3* slider_rot_vel )
+{
+
+  math::Vector3 normal_force_corrective_vel = computeNormalForceCorrectionTerm( info, receptacle_force );
+  math::Vector3 contact_point_des_lin_vel = math::Vector3( -target_sliding_vel_, 0, 0 ) + normal_force_corrective_vel;
+
+  double contact_angle;
+  math::Vector3 contact_point_des_rot_vel = computeAngleCorrectionTerm( target_sliding_angle_, &contact_angle );
+
+  transformContactVelToHandle( contact_angle, contact_point_des_lin_vel, contact_point_des_rot_vel, slider_lin_vel, slider_rot_vel );
+
+}
+
+void PlanarFoldingAdmittanceController::doFoldingUpdate( const common::UpdateInfo info,
+                                                         const math::Vector3& receptacle_force,
+                                                         math::Vector3* slider_lin_vel,
+                                                         math::Vector3* slider_rot_vel )
+{
+
+  math::Vector3 normal_force_corrective_vel = computeNormalForceCorrectionTerm( info, receptacle_force );
+  math::Vector3 tangential_force_corrective_vel = computeTangentialForceCorrectionTerm( info, receptacle_force );
+  math::Vector3 contact_point_des_lin_vel = tangential_force_corrective_vel + normal_force_corrective_vel;
+
+  double contact_angle;
+  math::Vector3 contact_point_des_rot_vel = computeAngleCorrectionTerm( target_folding_angle_, &contact_angle );
+
+  transformContactVelToHandle( contact_angle, contact_point_des_lin_vel, contact_point_des_rot_vel, slider_lin_vel, slider_rot_vel );
+
+}
+
+
+void PlanarFoldingAdmittanceController::transformContactVelToHandle( double angle,
+                                                                     const math::Vector3& contact_point_lin_vel,
+                                                                     const math::Vector3& contact_point_rot_vel,
+                                                                     math::Vector3* handle_lin_vel,
+                                                                     math::Vector3* handle_rot_vel )
+{
+
+  *handle_rot_vel = contact_point_rot_vel;
+  *handle_lin_vel = contact_point_lin_vel - contact_point_rot_vel.Cross( math::Vector3( -cos( angle )*0.04, 0, -sin( angle )*0.04 ) );
+
+}
+
+
+math::Vector3 PlanarFoldingAdmittanceController::computeAngleCorrectionTerm( double target_angle, double* angle )
 {
 
   math::Vector3 tangent( 1, 0, 0 );
   math::Vector3 slider_z = slider_link_->GetWorldCoGPose().rot.GetZAxis();
 
   double contact_angle = acos( slider_z.Normalize().Dot(tangent.Normalize()) );
-  double contact_angle_error = contact_angle - target_sliding_angle_;
+  double contact_angle_error = contact_angle - target_angle;
 
-  math::Vector3 contact_point_des_rot_vel( 0, rot_gain_*contact_angle_error, 0 );
+  if( angle ) *angle = contact_angle;
 
-  double force_error = -target_normal_force_ - receptacle_force.z;
-  integral_force_error_ += (info.simTime - previous_time_).Double() * force_error;
-
-  math::Vector3 normal_force_corrective_vel( 0, 0, normal_force_p_gain_*force_error + normal_force_i_gain_*integral_force_error_ );
-
-  math::Vector3 contact_point_des_lin_vel = math::Vector3( -target_sliding_vel_, 0, 0 ) + normal_force_corrective_vel;
-
-  math::Vector3 rot_corr_handle_lin_vel = -contact_point_des_rot_vel.Cross( math::Vector3( -cos(contact_angle)*0.04, 0, -sin(contact_angle)*0.04 ) );
-  math::Vector3 handle_des_lin_vel = rot_corr_handle_lin_vel + contact_point_des_lin_vel;
-
-  *slider_lin_vel = handle_des_lin_vel;
-  *slider_rot_vel = contact_point_des_rot_vel;
+  return math::Vector3( 0, rot_gain_*contact_angle_error, 0 );
 
 }
 
-void PlanarFoldingAdmittanceController::doFoldingUpdate( const common::UpdateInfo info,
-                                                         const math::Vector3& receptacle_force,
-                                                         const math::Vector3& receptacle_torque,
-                                                         const math::Vector3& slider_force,
-                                                         const math::Vector3& slider_torque,
-                                                         math::Vector3* slider_lin_vel,
-                                                         math::Vector3* slider_rot_vel )
+
+math::Vector3 PlanarFoldingAdmittanceController::computeNormalForceCorrectionTerm( const common::UpdateInfo info,
+                                                                                   const math::Vector3& receptacle_force )
 {
+
+  double force_error = -target_normal_force_ - receptacle_force.z;
+  integral_normal_force_error_ += (info.simTime - previous_time_).Double() * force_error;
+
+  return math::Vector3( 0, 0, normal_force_p_gain_*force_error + normal_force_i_gain_*integral_normal_force_error_ );
+
+}
+
+
+math::Vector3 PlanarFoldingAdmittanceController::computeTangentialForceCorrectionTerm( const common::UpdateInfo info,
+                                                                                       const math::Vector3& receptacle_force )
+{
+
+  double force_error = -target_tangential_force_ - receptacle_force.x;
+  integral_tangential_force_error_ += (info.simTime - previous_time_).Double() * force_error;
+
+  return math::Vector3( tangential_force_p_gain_*force_error + tangential_force_i_gain_*integral_tangential_force_error_, 0, 0 );
 
 }
 

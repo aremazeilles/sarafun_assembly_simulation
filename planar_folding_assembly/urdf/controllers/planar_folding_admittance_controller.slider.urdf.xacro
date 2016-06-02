@@ -15,8 +15,10 @@
       <tangential_force_p_gain>0.1</tangential_force_p_gain>
       <tangential_force_i_gain>0.1</tangential_force_i_gain>
       <rot_gain>0.2</rot_gain>
-      <switch_to_fold_threshold>0.5</switch_to_fold_threshold>
-      <switch_to_slide_threshold>0.2</switch_to_slide_threshold>
+      <contact_detection_vel>0.002</contact_detection_vel>
+      <contact_detection_threshold>0.01</contact_detection_threshold>
+      <switch_to_fold_threshold>0.02</switch_to_fold_threshold>
+      <switch_to_slide_threshold>0.01</switch_to_slide_threshold>
     </plugin>
   </gazebo>
 
