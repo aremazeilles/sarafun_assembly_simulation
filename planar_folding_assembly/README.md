@@ -145,5 +145,16 @@ Both objects are constructed out of geometric primitives, since these supposedly
 
 ![Receptacle object](img/receptacle.png)
 
+### Default parameters
+
+The geometric parameters used by the default configuration are shown in the table below.
+
+| Parameter      | Default value |
+|----------------|---------------|
+| Slider _l_     | 0.1 _m_       |
+| Slider _w_     | 0.02 _m_      |
+| Receptacle _l_ | 0.2 _m_       |
+| Receptacle _h_ | 0.05 _m_      |
+| Receptacle _w_ | 0.02 _m_      |
 
 [planar_folding_paper]: https://arxiv.org/abs/1604.06558
