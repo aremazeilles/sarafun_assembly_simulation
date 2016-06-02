@@ -5,7 +5,7 @@ The naming convention used is that the __slider__ object is the one assembled on
 
 ![Simulation screenshot](img/sim_screenshot.bmp)
 
-The objective of this simulation is to try to replicate the controller described in [this paper](https://arxiv.org/abs/1604.06558), in order to perform a sliding motion and then a folding motion while maintaining the desired contact forces.
+The objective of this simulation is to try to replicate the controller described in [this paper][planar_folding_paper], in order to perform a sliding motion and then a folding motion while maintaining the desired contact forces.
 
 
 ## Basic usage
@@ -25,6 +25,56 @@ roslaunch planar_folding_assembly spawn_slider.launch controller:=CONTROLLER_NAM
 In the `roslaunch` command above, `CONTROLLER_NAME` must correspond to the name of one of the files in [`urdf/controllers`](urdf/controllers), without the `.slider.urdf.xacro` extension.
 
 The reason for forcing the spawning order is that the controller plugin will try to retrieve a pointer to the receptacle object when being loaded, and spawning both at the same time can cause errors due to race conditions.
+
+
+## Available controllers
+
+A set of controllers has been implemented while testing that the simulation worked more or less as expected.
+This section provides a brief overview of what can be run after successfully downloading and compiling the package.
+The controllers are presented in increasing order of complexity, hopefully ending (soon) in the controller presented in the [paper][planar_folding_paper].
+
+Note that when parameters of a controller are specified, these are not ROS parameters but parameters passed as additional XML elements inside the `<gazebo>` tag that loads the controller. For instance, the `vertical_force_admittance_controller` could be loaded with the following XML code:
+
+```xml
+<gazebo>
+  <plugin name="vertical_force_admittance_controller" filename="libsarafun_pfa_vertical_force_admittance_controller.so">
+    <target_force>10</target_force>
+    <p_gain>0.1</p_gain>
+    <i_gain>0.1</i_gain>
+    <vert_correct_gain>0.1</vert_correct_gain>
+  </plugin>
+</gazebo>
+```
+
+### empty_controller
+
+Derives from [`ControllerBase`](#user-content-controller-infrastructure).
+
+As its name says, it's just an empty controller.
+
+### vertical_force_controller
+
+Derives from [`ControllerBase`](#user-content-controller-infrastructure).
+
+This controller applies a vertical velocity to the slider to try to regulate the contact force to that specified in its `target_force` parameter.
+A PI control law is used, with hardcoded gains.
+
+### vertical_force_admittance_controller
+
+Derives from [`AdmittanceControllerBase`](#user-content-admittance-controller-base).
+
+This is an improved implementation of the `vertical_force_controller`, in which the PI controller gains can be set using the `p_gain` and `i_gain` parameters.
+It also tries to keep the slider vertical, by correcting deviations with a proportional control law with the gain determined by the `vert_correct_gain` parameter.
+
+### sliding_admittance_controller
+
+Derives from [`AdmittanceControllerBase`](#user-content-admittance-controller-base).
+
+This controller tries to slide the slider against the receptacle, while maintaining the vertical contact force specified by `target_force` and keeping the slider at an angle specified by the `target_angle` parameter.
+The desired sliding velocity for the contact point is determined by the `target_vel` parameter, in _m/s_.
+
+Additional parameters are the `p_gain` and `i_gain` for the vertical force PI controller, and `rot_gain` for the P controller trying to regulate the desired angle between the objects.
+
 
 ## Controller infrastructure
 
@@ -94,3 +144,6 @@ Both objects are constructed out of geometric primitives, since these supposedly
 ### Receptacle
 
 ![Receptacle object](img/receptacle.png)
+
+
+[planar_folding_paper]: https://arxiv.org/abs/1604.06558
