@@ -3,7 +3,7 @@
 This package contains everything required to simulate a planar folding assembly operation in Gazebo.
 The naming convention used is that the __slider__ object is the one assembled on top of the __receptacle__ object.
 
-![Simulation screenshot](img/sim_screenshot.bmp)
+![Simulation screenshot](img/planar_folding.gif)
 
 The objective of this simulation is to try to replicate the controller described in [this paper][planar_folding_paper], in order to perform a sliding motion and then a folding motion while maintaining the desired contact forces.
 
@@ -31,7 +31,7 @@ The reason for forcing the spawning order is that the controller plugin will try
 
 A set of controllers has been implemented while testing that the simulation worked more or less as expected.
 This section provides a brief overview of what can be run after successfully downloading and compiling the package.
-The controllers are presented in increasing order of complexity, hopefully ending (soon) in the controller presented in the [paper][planar_folding_paper].
+The controllers are presented in increasing order of complexity, ending in the controller presented in the [paper][planar_folding_paper].
 
 Note that when parameters of a controller are specified, these are not ROS parameters but parameters passed as additional XML elements inside the `<gazebo>` tag that loads the controller. For instance, the `vertical_force_admittance_controller` could be loaded with the following XML code:
 
@@ -74,6 +74,35 @@ This controller tries to slide the slider against the receptacle, while maintain
 The desired sliding velocity for the contact point is determined by the `target_vel` parameter, in _m/s_.
 
 Additional parameters are the `p_gain` and `i_gain` for the vertical force PI controller, and `rot_gain` for the P controller trying to regulate the desired angle between the objects.
+
+### planar_folding_admittance_controller
+
+Derives from [`AdmittanceControllerBase`](#user-content-admittance-controller-base).
+
+This controller implements the two states in the controller described in the [paper][planar_folding_paper]: sliding state and folding state.
+
+In the sliding state, normal contact force between the slider and the receptacle is regulated to its desired value.
+
+In the folding state, triggered once contact with the vertical wall of the receptacle object is reached, the force against this vertical wall (referred to as tangential force) is regulated as well, while the object is rotated towards a new target angle.
+
+An additional initial state is include to establish contact by moving the slider slowly in the direction of the receptacle.
+
+The complete set of parameters is:
+
+- `target_sliding_angle`: desired angle between the slider and the receptacle during the sliding state
+- `target_sliding_vel`: desired tangential speed of the contact point during the sliding state
+- `target_folding_angle`: desired angle between the slider and the receptacle during the folding state
+- `target_normal_force`: desired normal force between the slider and the receptacle
+- `target_tangential_force`: desired tangential force during the folding state
+- `normal_force_p_gain`: proportional gain of normal force PI controller
+- `normal_force_i_gain`: integral gain of normal force PI controller
+- `tangential_force_p_gain`: proportional gain of tangential force PI controller
+- `tangential_force_i_gain`: integral gain of tangential force PI controller
+- `rot_gain`: proportional gain of angular P controller
+- `contact_detection_vel`: velocity of motion towards contact during the initial contact establishing state
+- `contact_detection_threshold`: force threshold to transition from the initial state to the sliding state
+- `switch_to_fold_threshold`: force threshold to transition from the sliding state to the folding state
+- `switch_to_slide_threshold`: force threshold to transition from the folding state back to the sliding state
 
 
 ## Controller infrastructure

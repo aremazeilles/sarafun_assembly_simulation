@@ -9,16 +9,16 @@ namespace gazebo
 const double PI = 4*atan2(1,1);
 
 
-namespace PlanarFoldingPhases
+namespace PlanarFoldingStates
 {
-enum PlanarFoldingPhase
+enum PlanarFoldingState
 {
   SEARCHING_CONTACT,
   SLIDING,
   FOLDING
 };
 }
-typedef PlanarFoldingPhases::PlanarFoldingPhase PlanarFoldingPhase;
+typedef PlanarFoldingStates::PlanarFoldingState PlanarFoldingState;
 
 
 class PlanarFoldingAdmittanceController : public AdmittanceControllerBase
@@ -90,7 +90,7 @@ private:
 
   math::Pose slider_cog_T_virtual_contact_point_;
 
-  PlanarFoldingPhase phase_;
+  PlanarFoldingState state_;
 
 };
 
@@ -254,7 +254,7 @@ void PlanarFoldingAdmittanceController::admittanceControllerLoad( physics::Model
 
   slider_cog_T_virtual_contact_point_ = math::Pose( 0, 0, -0.04, 0, 0, 0 );
 
-  phase_ = PlanarFoldingPhases::SEARCHING_CONTACT;
+  state_ = PlanarFoldingStates::SEARCHING_CONTACT;
 
 }
 
@@ -274,44 +274,44 @@ void PlanarFoldingAdmittanceController::admittanceControllerUpdate( const common
     time_initialised_ = true;
   }
 
-  switch( phase_ )
+  switch( state_ )
   {
-    case PlanarFoldingPhases::SEARCHING_CONTACT:
+    case PlanarFoldingStates::SEARCHING_CONTACT:
       if( receptacle_force.z <= -contact_detection_threshold_ )
       {
-        ROS_WARN( "Contact detected, switching to sliding phase" );
-        phase_ = PlanarFoldingPhases::SLIDING;
+        ROS_WARN( "Contact detected, switching to sliding state" );
+        state_ = PlanarFoldingStates::SLIDING;
       }
       break;
-    case PlanarFoldingPhases::SLIDING:
+    case PlanarFoldingStates::SLIDING:
       if( receptacle_force.x <= -switch_to_fold_threshold_ )
       {
-        ROS_WARN( "Tangential contact detected, switching to folding phase" );
-        phase_ = PlanarFoldingPhases::FOLDING;
+        ROS_WARN( "Tangential contact detected, switching to folding state" );
+        state_ = PlanarFoldingStates::FOLDING;
       }
       break;
-    case PlanarFoldingPhases::FOLDING:
+    case PlanarFoldingStates::FOLDING:
       if( receptacle_force.x >= -switch_to_slide_threshold_ )
       {
-        ROS_WARN( "Tangential contact lost, switching to sliding phase" );
-        phase_ = PlanarFoldingPhases::SLIDING;
+        ROS_WARN( "Tangential contact lost, switching to sliding state" );
+        state_ = PlanarFoldingStates::SLIDING;
       }
       break;
   }
 
-  switch( phase_ )
+  switch( state_ )
   {
-    case PlanarFoldingPhases::SEARCHING_CONTACT:
+    case PlanarFoldingStates::SEARCHING_CONTACT:
       doSearchingContactUpdate( slider_lin_vel, slider_rot_vel );
       break;
-    case PlanarFoldingPhases::SLIDING:
+    case PlanarFoldingStates::SLIDING:
       doSlidingUpdate( info, receptacle_force, slider_lin_vel, slider_rot_vel );
       break;
-    case PlanarFoldingPhases::FOLDING:
+    case PlanarFoldingStates::FOLDING:
       doFoldingUpdate( info, receptacle_force, slider_lin_vel, slider_rot_vel );
       break;
     default:
-      ROS_ERROR_STREAM_THROTTLE( 1.0, "Somehow reached an invalid phase: " << phase_ << ". Please stop the simulation." );
+      ROS_ERROR_STREAM_THROTTLE( 1.0, "Somehow reached an invalid state: " << state_ << ". Please stop the simulation." );
       *slider_lin_vel = math::Vector3::Zero;
       *slider_rot_vel = math::Vector3::Zero;
       break;
