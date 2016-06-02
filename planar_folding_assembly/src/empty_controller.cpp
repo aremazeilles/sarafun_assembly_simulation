@@ -2,7 +2,8 @@
 
 namespace gazebo
 {
-  
+
+
 class EmptyController : public ControllerBase
 {
   
@@ -12,6 +13,8 @@ class EmptyController : public ControllerBase
 
 };
 
+
 GZ_REGISTER_MODEL_PLUGIN( EmptyController )
+
 
 }

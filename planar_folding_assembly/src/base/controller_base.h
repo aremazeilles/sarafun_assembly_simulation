@@ -16,6 +16,7 @@
 namespace gazebo
 {
 
+
 class ControllerBase : public ModelPlugin
 {
 
