@@ -5,7 +5,7 @@
 
   <gazebo>
     <plugin name="vertical_force_controller" filename="libsarafun_pfa_vertical_force_controller.so">
-      <target_force>-40</target_force>
+      <target_force>10</target_force>
     </plugin>
   </gazebo>
 

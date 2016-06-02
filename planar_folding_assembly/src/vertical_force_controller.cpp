@@ -29,8 +29,8 @@ void VerticalForceController::controllerLoad( physics::ModelPtr model, sdf::Elem
 
   if( !sdf->HasElement("target_force") )
   {
-    ROS_WARN("Plugin missing <target_force>, using default (-40N)");
-    target_force_ = -40;
+    ROS_WARN("Plugin missing <target_force>, using default (10 N)");
+    target_force_ = 10;
   }
   else
   {
@@ -53,7 +53,7 @@ void VerticalForceController::controllerUpdate( const common::UpdateInfo info )
     time_initialised_ = true;
   }
 
-  double error = target_force_ - receptacle_wrench.body2Force.z;
+  double error = -target_force_ - receptacle_wrench.body2Force.z;
 
   integral_force_error_ += (info.simTime - previous_time_).Double() * error;
 
