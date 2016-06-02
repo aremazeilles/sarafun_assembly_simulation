@@ -31,7 +31,6 @@ private:
   double p_gain_;
   double i_gain_;
   double rot_gain_;
-  double vert_correct_gain_;
 
   bool time_initialised_;
   common::Time previous_time_;
@@ -103,16 +102,6 @@ void SlidingAdmittanceController::admittanceControllerLoad( physics::ModelPtr mo
   else
   {
     rot_gain_ = sdf->GetElement("rot_gain")->Get<double>();
-  }
-
-  if( !sdf->HasElement("vert_correct_gain") )
-  {
-    ROS_WARN("Plugin missing <vert_correct_gain>, using default (0.1)");
-    vert_correct_gain_ = 0.1;
-  }
-  else
-  {
-    vert_correct_gain_ = sdf->GetElement("vert_correct_gain")->Get<double>();
   }
 
   time_initialised_ = false;
