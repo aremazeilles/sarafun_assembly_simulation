@@ -31,4 +31,7 @@ target_link_libraries( sarafun_pfa_vertical_force_admittance_controller ${GAZEBO
 add_library( sarafun_pfa_sliding_admittance_controller src/sliding_admittance_controller.cpp )
 target_link_libraries( sarafun_pfa_sliding_admittance_controller ${GAZEBO_LIBRARIES} ${Boost_LIBRARIES} )
 
+add_library( sarafun_pfa_planar_folding_admittance_controller src/planar_folding_admittance_controller.cpp )
+target_link_libraries( sarafun_pfa_planar_folding_admittance_controller ${GAZEBO_LIBRARIES} ${Boost_LIBRARIES} )
+
 
