@@ -11,7 +11,6 @@
       <p_gain>0.1</p_gain>
       <i_gain>0.1</i_gain>
       <rot_gain>0.1</rot_gain>
-      <vert_correct_gain>0.1</vert_correct_gain>
     </plugin>
   </gazebo>
 

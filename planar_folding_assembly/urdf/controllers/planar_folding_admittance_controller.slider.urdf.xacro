@@ -5,13 +5,18 @@
 
   <gazebo>
     <plugin name="planar_folding_admittance_controller" filename="libsarafun_pfa_planar_folding_admittance_controller.so">
-      <target_angle>1.0</target_angle>
-      <target_force>10</target_force>
-      <target_vel>0.005</target_vel>
-      <p_gain>0.1</p_gain>
-      <i_gain>0.1</i_gain>
+      <target_sliding_angle>1.0</target_sliding_angle>
+      <target_sliding_vel>0.005</target_sliding_vel>
+      <target_folding_angle>0.2</target_folding_angle>
+      <target_normal_force>10</target_normal_force>
+      <target_tangential_force>10</target_tangential_force>
+      <normal_force_p_gain>0.1</normal_force_p_gain>
+      <normal_force_i_gain>0.1</normal_force_i_gain>
+      <tangential_force_p_gain>0.1</tangential_force_p_gain>
+      <tangential_force_i_gain>0.1</tangential_force_i_gain>
       <rot_gain>0.2</rot_gain>
-      <vert_correct_gain>0.1</vert_correct_gain>
+      <switch_to_fold_threshold>0.5</switch_to_fold_threshold>
+      <switch_to_slide_threshold>0.2</switch_to_slide_threshold>
     </plugin>
   </gazebo>
 
